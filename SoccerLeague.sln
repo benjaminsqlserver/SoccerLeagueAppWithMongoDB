@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoccerLeague.Application", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoccerLeague.Infrastructure", "SoccerLeague.Infrastructure\SoccerLeague.Infrastructure.csproj", "{7D52498A-38E2-4C9F-BAE7-B9759EC2A71C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoccerLeague.API", "SoccerLeague.API\SoccerLeague.API.csproj", "{28106960-D20D-4A9C-B64F-360D2D70A7FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7D52498A-38E2-4C9F-BAE7-B9759EC2A71C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D52498A-38E2-4C9F-BAE7-B9759EC2A71C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D52498A-38E2-4C9F-BAE7-B9759EC2A71C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28106960-D20D-4A9C-B64F-360D2D70A7FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28106960-D20D-4A9C-B64F-360D2D70A7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28106960-D20D-4A9C-B64F-360D2D70A7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28106960-D20D-4A9C-B64F-360D2D70A7FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

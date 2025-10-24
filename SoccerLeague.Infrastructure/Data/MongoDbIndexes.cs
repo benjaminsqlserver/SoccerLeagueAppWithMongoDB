@@ -164,22 +164,24 @@ namespace SoccerLeague.Infrastructure.Data
         {
             var indexKeysDefinitions = new[]
             {
-                Builders<Standing>.IndexKeys.Ascending(s => s.SeasonId),
-                Builders<Standing>.IndexKeys.Ascending(s => s.TeamId),
-                Builders<Standing>.IndexKeys.Descending(s => s.Points),
-                Builders<Standing>.IndexKeys.Ascending(s => s.Position),
-                
-                // Compound index for season standings (most common query)
-                Builders<Standing>.IndexKeys
-                    .Ascending(s => s.SeasonId)
-                    .Descending(s => s.Points)
-                    .Descending(s => s.GoalDifference),
-                
-                // Unique index to ensure one standing per team per season
-                Builders<Standing>.IndexKeys
-                    .Ascending(s => s.SeasonId)
-                    .Ascending(s => s.TeamId)
-            };
+        Builders<Standing>.IndexKeys.Ascending(s => s.SeasonId),
+        Builders<Standing>.IndexKeys.Ascending(s => s.TeamId),
+        Builders<Standing>.IndexKeys.Descending(s => s.Points),
+        Builders<Standing>.IndexKeys.Ascending(s => s.Position),
+        
+        // Compound index for season standings (most common query)
+        // Index by Points, GoalsFor, and GoalsAgainst (which together determine ranking)
+        Builders<Standing>.IndexKeys
+            .Ascending(s => s.SeasonId)
+            .Descending(s => s.Points)
+            .Descending(s => s.GoalsFor)
+            .Ascending(s => s.GoalsAgainst),
+        
+        // Unique index to ensure one standing per team per season
+        Builders<Standing>.IndexKeys
+            .Ascending(s => s.SeasonId)
+            .Ascending(s => s.TeamId)
+    };
 
             for (int i = 0; i < indexKeysDefinitions.Length; i++)
             {
