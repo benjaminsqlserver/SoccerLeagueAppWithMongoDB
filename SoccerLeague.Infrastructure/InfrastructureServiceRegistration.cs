@@ -25,6 +25,7 @@ namespace SoccerLeague.Infrastructure
             // Register repositories
             services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IMatchEventTypeRepository, MatchEventTypeRepository>();
 
             // Register seeder
             services.AddScoped<DbSeeder>();
