@@ -23,8 +23,9 @@ namespace SoccerLeague.Infrastructure
             services.AddSingleton<MongoDbContext>();
 
             // Register repositories
-            services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IMatchRepository, MatchRepository>();
+            services.AddScoped<IMatchStatusRepository, MatchStatusRepository>();
             services.AddScoped<IMatchEventTypeRepository, MatchEventTypeRepository>();
 
             // Register seeder
