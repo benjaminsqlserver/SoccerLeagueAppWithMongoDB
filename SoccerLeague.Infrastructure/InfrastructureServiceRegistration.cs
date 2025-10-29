@@ -27,6 +27,7 @@ namespace SoccerLeague.Infrastructure
             services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped<IMatchStatusRepository, MatchStatusRepository>();
             services.AddScoped<IMatchEventTypeRepository, MatchEventTypeRepository>();
+            services.AddScoped<IPlayerPositionRepository, PlayerPositionRepository>();
 
             // Register seeder
             services.AddScoped<DbSeeder>();
