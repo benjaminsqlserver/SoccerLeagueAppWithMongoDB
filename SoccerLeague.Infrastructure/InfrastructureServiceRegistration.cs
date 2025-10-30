@@ -23,13 +23,15 @@ namespace SoccerLeague.Infrastructure
             services.AddSingleton<MongoDbContext>();
 
             // Register repositories
-            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+           
             services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped<IMatchStatusRepository, MatchStatusRepository>();
             services.AddScoped<IMatchEventTypeRepository, MatchEventTypeRepository>();
             services.AddScoped<IPlayerPositionRepository, PlayerPositionRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<ITeamStatusRepository, TeamStatusRepository>();
+            services.AddScoped<ISeasonRepository, SeasonRepository>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Register seeder
             services.AddScoped<DbSeeder>();
