@@ -33,6 +33,7 @@ namespace SoccerLeague.Infrastructure
             services.AddScoped<ISeasonRepository, SeasonRepository>();
 
             services.AddScoped<ISeasonStatusRepository, SeasonStatusRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Register seeder
