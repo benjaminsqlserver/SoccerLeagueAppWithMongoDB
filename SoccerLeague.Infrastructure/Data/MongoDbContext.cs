@@ -32,6 +32,8 @@ namespace SoccerLeague.Infrastructure.Data
 
         public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
 
+        public IMongoCollection<Role> Roles => _database.GetCollection<Role>("Roles");
+
         /// <summary>
         /// Gets a collection by name for generic operations.
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using SoccerLeague.Domain.Constants;
 using SoccerLeague.Domain.Entities;
 using SoccerLeague.Infrastructure.Data;
@@ -23,6 +24,7 @@ namespace SoccerLeague.Infrastructure.Data
         /// </summary>
         public async Task SeedAsync()
         {
+             await SeedRolesAsync();
             await SeedPlayerPositionsAsync();
             await SeedMatchStatusesAsync();
             await SeedTeamStatusesAsync();
@@ -107,6 +109,131 @@ namespace SoccerLeague.Infrastructure.Data
             }).ToList();
 
             await _context.SeasonStatuses.InsertManyAsync(statuses);
+        }
+
+
+        private async Task SeedRolesAsync()
+        {
+            var count = await _context.Roles.CountDocumentsAsync(FilterDefinition<Role>.Empty);
+            if (count > 0) return;
+
+            var roles = new List<Role>
+    {
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.Administrator,
+            NormalizedName = SystemRoles.Administrator.ToUpper(),
+            Description = "Full system access with all permissions",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 1,
+            Permissions = Permissions.AllPermissions.ToList(),
+            CreatedDate = DateTime.UtcNow
+        },
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.Manager,
+            NormalizedName = SystemRoles.Manager.ToUpper(),
+            Description = "League operations management access",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 2,
+            Permissions = new List<string>
+            {
+                Permissions.ViewMatches, Permissions.CreateMatches,
+                Permissions.UpdateMatches, Permissions.ManageMatchEvents,
+                Permissions.ViewTeams, Permissions.ViewPlayers,
+                Permissions.ViewSeasons, Permissions.ViewStandings,
+                Permissions.ViewReports
+            },
+            CreatedDate = DateTime.UtcNow
+        },
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.Referee,
+            NormalizedName = SystemRoles.Referee.ToUpper(),
+            Description = "Match management and event recording",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 3,
+            Permissions = new List<string>
+            {
+                Permissions.ViewMatches, Permissions.UpdateMatches,
+                Permissions.ManageMatchEvents
+            },
+            CreatedDate = DateTime.UtcNow
+        },
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.TeamManager,
+            NormalizedName = SystemRoles.TeamManager.ToUpper(),
+            Description = "Team and player management",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 4,
+            Permissions = new List<string>
+            {
+                Permissions.ViewTeams, Permissions.UpdateTeams,
+                Permissions.ViewPlayers, Permissions.CreatePlayers,
+                Permissions.UpdatePlayers, Permissions.ViewMatches,
+                Permissions.ViewStandings
+            },
+            CreatedDate = DateTime.UtcNow
+        },
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.Player,
+            NormalizedName = SystemRoles.Player.ToUpper(),
+            Description = "Player profile access",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 5,
+            Permissions = new List<string>
+            {
+                Permissions.ViewMatches, Permissions.ViewTeams,
+                Permissions.ViewPlayers, Permissions.ViewStandings
+            },
+            CreatedDate = DateTime.UtcNow
+        },
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.Fan,
+            NormalizedName = SystemRoles.Fan.ToUpper(),
+            Description = "View-only access to matches and standings",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 6,
+            Permissions = new List<string>
+            {
+                Permissions.ViewMatches, Permissions.ViewTeams,
+                Permissions.ViewPlayers, Permissions.ViewStandings
+            },
+            CreatedDate = DateTime.UtcNow
+        },
+        new Role
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = SystemRoles.User,
+            NormalizedName = SystemRoles.User.ToUpper(),
+            Description = "Basic registered user access",
+            IsSystemRole = true,
+            IsActive = true,
+            DisplayOrder = 7,
+            Permissions = new List<string>
+            {
+                Permissions.ViewMatches, Permissions.ViewStandings
+            },
+            CreatedDate = DateTime.UtcNow
+        }
+    };
+
+            await _context.Roles.InsertManyAsync(roles);
         }
 
         private async Task SeedMatchEventTypesAsync()
