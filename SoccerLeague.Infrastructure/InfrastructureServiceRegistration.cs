@@ -37,6 +37,7 @@ namespace SoccerLeague.Infrastructure
             services.AddScoped<IStandingRepository, StandingRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Register seeder

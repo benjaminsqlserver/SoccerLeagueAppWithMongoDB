@@ -13,6 +13,7 @@ namespace SoccerLeague.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container
+            builder.Services.AddHostedService<SessionCleanupService>();
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
