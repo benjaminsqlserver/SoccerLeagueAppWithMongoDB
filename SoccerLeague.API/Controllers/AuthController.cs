@@ -1,15 +1,23 @@
-﻿using MediatR;
+﻿//============================================================================
+// API/Controllers/AuthController.cs - COMPLETE IMPLEMENTATION
+//============================================================================
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SoccerLeague.API.Models;
 using SoccerLeague.Application.DTOs.Auth;
-using SoccerLeague.Application.Features.Auth.Commands.Register;
+using SoccerLeague.Application.DTOs.User;
+using SoccerLeague.Application.Features.Auth.Commands.ForgotPassword;
 using SoccerLeague.Application.Features.Auth.Commands.Login;
 using SoccerLeague.Application.Features.Auth.Commands.Logout;
-using SoccerLeague.Application.Features.Auth.Commands.ForgotPassword;
+using SoccerLeague.Application.Features.Auth.Commands.RefreshToken;
+using SoccerLeague.Application.Features.Auth.Commands.Register;
 using SoccerLeague.Application.Features.Auth.Commands.ResetPassword;
 using SoccerLeague.Application.Features.Auth.Commands.VerifyEmail;
-using SoccerLeague.Application.Features.Auth.Commands.RefreshToken;
+using SoccerLeague.Application.Features.Auth.Commands.GoogleLogin;
+using SoccerLeague.Application.Features.Auth.Commands.ResendVerificationEmail;
+using SoccerLeague.Application.Features.Auth.Commands.RevokeToken;
+using SoccerLeague.Application.Features.Users.Commands.ChangePassword;
 
 namespace SoccerLeague.API.Controllers
 {
@@ -127,17 +135,32 @@ namespace SoccerLeague.API.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse<AuthResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<AuthResponseDto>), StatusCodes.Status400BadRequest)]
-        public ActionResult<ApiResponse<AuthResponseDto>> GoogleLogin([FromBody] GoogleLoginDto googleLoginDto)
+        public async Task<ActionResult<ApiResponse<AuthResponseDto>>> GoogleLogin([FromBody] GoogleLoginDto googleLoginDto)
         {
             try
             {
-                // This would use a GoogleLoginCommand similar to LoginCommand
-                // For brevity, showing the pattern
-                _logger.LogInformation("Google login attempt");
+                var command = new GoogleLoginCommand
+                {
+                    GoogleLoginDto = googleLoginDto,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    UserAgent = Request.Headers["User-Agent"].ToString()
+                };
 
-                // TODO: Implement GoogleLoginCommand and handler
-                return BadRequest(ApiResponse<AuthResponseDto>.Error(
-                    "Google login not yet implemented"));
+                var result = await _mediator.Send(command);
+
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed Google login attempt");
+                    return BadRequest(ApiResponse<AuthResponseDto>.Error(
+                        result.ErrorMessage ?? "Google login failed",
+                        result.Errors));
+                }
+
+                _logger.LogInformation("User logged in successfully via Google: {Email}", result.Data!.Email);
+
+                return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(
+                    result.Data!,
+                    "Google login successful"));
             }
             catch (Exception ex)
             {
@@ -359,12 +382,24 @@ namespace SoccerLeague.API.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
-        public ActionResult<ApiResponse<bool>> ResendVerificationEmail([FromBody] ResendVerificationEmailDto resendDto)
+        public async Task<ActionResult<ApiResponse<bool>>> ResendVerificationEmail([FromBody] ResendVerificationEmailDto resendDto)
         {
             try
             {
-                // This would use a ResendVerificationEmailCommand
-                // For brevity, showing the pattern
+                var command = new ResendVerificationEmailCommand
+                {
+                    ResendDto = resendDto
+                };
+
+                var result = await _mediator.Send(command);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(ApiResponse<bool>.Error(
+                        result.ErrorMessage ?? "Failed to resend verification email",
+                        result.Errors));
+                }
+
                 return Ok(ApiResponse<bool>.SuccessResponse(
                     true,
                     "If an unverified account exists with this email, a new verification link has been sent."));
@@ -393,6 +428,7 @@ namespace SoccerLeague.API.Controllers
                 var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
                 var name = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
                 var roles = User.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
+                var emailConfirmed = User.FindFirst("email_confirmed")?.Value;
 
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -404,7 +440,8 @@ namespace SoccerLeague.API.Controllers
                     userId,
                     email,
                     name,
-                    roles
+                    roles,
+                    emailConfirmed = bool.Parse(emailConfirmed ?? "false")
                 };
 
                 return Ok(ApiResponse<object>.SuccessResponse(userData));
@@ -414,6 +451,158 @@ namespace SoccerLeague.API.Controllers
                 _logger.LogError(ex, "Error getting current user");
                 return StatusCode(500, ApiResponse<object>.Error(
                     "An error occurred while retrieving user information"));
+            }
+        }
+
+        /// <summary>
+        /// Change password for authenticated user
+        /// </summary>
+        /// <param name="changePasswordDto">Current and new password</param>
+        /// <returns>Success status</returns>
+        [HttpPost("change-password")]
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<ApiResponse<bool>>> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(ApiResponse<bool>.Error("User not authenticated"));
+                }
+
+                // Ensure the userId from token matches the request
+                if (userId != changePasswordDto.UserId)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        ApiResponse<bool>.Error("You can only change your own password"));
+                }
+
+                var command = new ChangePasswordCommand
+                {
+                    PasswordData = changePasswordDto
+                };
+
+                var result = await _mediator.Send(command);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(ApiResponse<bool>.Error(
+                        result.ErrorMessage ?? "Failed to change password",
+                        result.Errors));
+                }
+
+                _logger.LogInformation("Password changed successfully for user: {UserId}", userId);
+
+                return Ok(ApiResponse<bool>.SuccessResponse(
+                    true,
+                    "Password changed successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password");
+                return StatusCode(500, ApiResponse<bool>.Error(
+                    "An error occurred while changing password"));
+            }
+        }
+
+        /// <summary>
+        /// Revoke a specific refresh token (terminate session)
+        /// </summary>
+        /// <param name="refreshTokenDto">Refresh token to revoke</param>
+        /// <returns>Success status</returns>
+        [HttpPost("revoke-token")]
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<ApiResponse<bool>>> RevokeToken([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(ApiResponse<bool>.Error("User not authenticated"));
+                }
+
+                var command = new RevokeTokenCommand
+                {
+                    RefreshToken = refreshTokenDto.RefreshToken,
+                    UserId = userId
+                };
+
+                var result = await _mediator.Send(command);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(ApiResponse<bool>.Error(
+                        result.ErrorMessage ?? "Failed to revoke token",
+                        result.Errors));
+                }
+
+                _logger.LogInformation("Token revoked successfully for user: {UserId}", userId);
+
+                return Ok(ApiResponse<bool>.SuccessResponse(
+                    true,
+                    "Token revoked successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error revoking token");
+                return StatusCode(500, ApiResponse<bool>.Error(
+                    "An error occurred while revoking token"));
+            }
+        }
+
+        /// <summary>
+        /// Validate current access token (health check for authentication)
+        /// </summary>
+        /// <returns>Token validity status</returns>
+        [HttpGet("validate-token")]
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        public ActionResult<ApiResponse<object>> ValidateToken()
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(ApiResponse<object>.Error("Invalid token"));
+                }
+
+                var expClaim = User.FindFirst("exp")?.Value;
+                DateTime? expiresAt = null;
+
+                if (!string.IsNullOrEmpty(expClaim) && long.TryParse(expClaim, out long exp))
+                {
+                    expiresAt = DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime;
+                }
+
+                var tokenInfo = new
+                {
+                    valid = true,
+                    userId,
+                    expiresAt,
+                    isExpired = expiresAt.HasValue && expiresAt.Value < DateTime.UtcNow
+                };
+
+                return Ok(ApiResponse<object>.SuccessResponse(tokenInfo, "Token is valid"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating token");
+                return StatusCode(500, ApiResponse<object>.Error(
+                    "An error occurred while validating token"));
             }
         }
     }
