@@ -105,6 +105,8 @@ namespace SoccerLeague.API
 
             app.UseAuthorization();
 
+            app.UseAuditLogging();
+
             app.MapControllers();
 
             app.Run();

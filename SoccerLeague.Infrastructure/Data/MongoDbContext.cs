@@ -36,6 +36,8 @@ namespace SoccerLeague.Infrastructure.Data
 
         public IMongoCollection<UserSession> UserSessions => _database.GetCollection<UserSession>("UserSessions");
 
+        public IMongoCollection<AuditLog> AuditLogs => _database.GetCollection<AuditLog>("AuditLogs");
+
         /// <summary>
         /// Gets a collection by name for generic operations.
         /// </summary>
