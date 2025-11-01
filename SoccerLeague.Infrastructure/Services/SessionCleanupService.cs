@@ -3,39 +3,48 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SoccerLeague.Application.Contracts.Persistence;
 
-public class SessionCleanupService : BackgroundService
+namespace SoccerLeague.Infrastructure.Services
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<SessionCleanupService> _logger;
-    private readonly TimeSpan _cleanupInterval = TimeSpan.FromHours(1);
-
-    public SessionCleanupService(IServiceProvider serviceProvider, ILogger<SessionCleanupService> logger)
+    public class SessionCleanupService : BackgroundService
     {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-    }
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<SessionCleanupService> _logger;
+        private readonly TimeSpan _cleanupInterval = TimeSpan.FromHours(1);
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        while (!stoppingToken.IsCancellationRequested)
+        public SessionCleanupService(
+            IServiceProvider serviceProvider,
+            ILogger<SessionCleanupService> logger)
         {
-            try
-            {
-                using var scope = _serviceProvider.CreateScope();
-                var repository = scope.ServiceProvider.GetRequiredService<IUserSessionRepository>();
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+        }
 
-                var result = await repository.CleanupExpiredSessionsAsync();
-                if (result)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("Session Cleanup Service is starting");
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
                 {
-                    _logger.LogInformation("Expired sessions cleaned up at {Time}", DateTime.UtcNow);
+                    using var scope = _serviceProvider.CreateScope();
+                    var repository = scope.ServiceProvider.GetRequiredService<IUserSessionRepository>();
+
+                    var result = await repository.CleanupExpiredSessionsAsync();
+                    if (result)
+                    {
+                        _logger.LogInformation("Expired sessions cleaned up at {Time}", DateTime.UtcNow);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error cleaning up expired sessions");
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error cleaning up expired sessions");
+                }
+
+                await Task.Delay(_cleanupInterval, stoppingToken);
             }
 
-            await Task.Delay(_cleanupInterval, stoppingToken);
+            _logger.LogInformation("Session Cleanup Service is stopping");
         }
     }
 }
