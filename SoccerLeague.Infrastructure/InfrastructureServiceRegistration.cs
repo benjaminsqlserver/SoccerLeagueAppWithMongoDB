@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SoccerLeague.Application.Contracts.Persistence;
 using SoccerLeague.Infrastructure.Data;
 using SoccerLeague.Infrastructure.Repositories;
+using SoccerLeague.Infrastructure.Services;
 
 namespace SoccerLeague.Infrastructure
 {
@@ -38,7 +39,18 @@ namespace SoccerLeague.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+
+            // Register AuditLog repository
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
+           
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            // Register AuditLog services
+            services.AddScoped<AuditLogService>();
+
+            // Register background service for cleanup 
+            services.AddHostedService<AuditLogCleanupService>();
 
             // Register seeder
             services.AddScoped<DbSeeder>();
