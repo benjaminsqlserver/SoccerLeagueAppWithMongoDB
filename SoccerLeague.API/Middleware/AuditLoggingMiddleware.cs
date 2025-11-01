@@ -88,10 +88,18 @@ namespace SoccerLeague.API.Middleware
             if (request.ContentLength > 0)
             {
                 request.EnableBuffering();
-                var buffer = new byte[request.ContentLength.Value];
-                await request.Body.ReadAsync(buffer, 0, buffer.Length);
+
+                // Use StreamReader for reliable reading
+                using var reader = new StreamReader(
+                    request.Body,
+                    encoding: Encoding.UTF8,
+                    detectEncodingFromByteOrderMarks: false,
+                    bufferSize: -1,
+                    leaveOpen: true);
+
+                var body = await reader.ReadToEndAsync();
                 request.Body.Position = 0;
-                return Encoding.UTF8.GetString(buffer);
+                return body;
             }
             return null;
         }

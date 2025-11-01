@@ -1,9 +1,10 @@
 namespace SoccerLeague.API
 {
+    using Microsoft.OpenApi.Models;
+    using SoccerLeague.API.Middleware;
     using SoccerLeague.Application;
     using SoccerLeague.Infrastructure;
     using SoccerLeague.Infrastructure.Data;
-    using SoccerLeague.API.Middleware;
     using System.Text.Json.Serialization;
 
     public class Program
@@ -12,8 +13,7 @@ namespace SoccerLeague.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container
-            builder.Services.AddHostedService<SessionCleanupService>();
+           
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -27,26 +27,34 @@ namespace SoccerLeague.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                c.SwaggerDoc("v1", new() { Title = "Soccer League API", Version = "v1" });
+
+                // Add JWT authentication to Swagger
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Title = "Soccer League API",
-                    Version = "v1",
-                    Description = "API for managing soccer league matches, teams, players, and statistics",
-                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
-                    {
-                        Name = "Soccer League Management",
-                        Email = "benjaminsqlserver@gmail.com"
-                    }
+                    Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
                 });
 
-                // Include XML comments if available
-                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                if (File.Exists(xmlPath))
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
                 {
-                    c.IncludeXmlComments(xmlPath);
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 }
+            },
+            Array.Empty<string>()
+        }
+    });
             });
+
 
             // Register Application Services (MediatR, AutoMapper, FluentValidation)
             builder.Services.AddApplicationServices();
@@ -103,6 +111,8 @@ namespace SoccerLeague.API
 
             app.UseCors("AllowAll");
 
+
+            app.UseAuthentication();  // Must come before UseAuthorization
             app.UseAuthorization();
 
             app.UseAuditLogging();

@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using SoccerLeague.Application.Contracts.Persistence;
+using SoccerLeague.Application.Contracts.Services;
 using SoccerLeague.Infrastructure.Data;
 using SoccerLeague.Infrastructure.Repositories;
 using SoccerLeague.Infrastructure.Services;
+using System.Text;
 
 namespace SoccerLeague.Infrastructure
 {
@@ -46,11 +50,51 @@ namespace SoccerLeague.Infrastructure
            
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+
+            // Register authentication services
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+
+
             // Register AuditLog services
             services.AddScoped<AuditLogService>();
 
+            // Register HttpClient for GoogleAuthService
+            services.AddHttpClient();
+
             // Register background service for cleanup 
             services.AddHostedService<AuditLogCleanupService>();
+            services.AddHostedService<SessionCleanupService>();
+
+            // Configure JWT Authentication
+            var jwtSettings = configuration.GetSection("Jwt");
+            var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+            var key = Encoding.UTF8.GetBytes(secretKey);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false; // Set to true in production
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
 
             // Register seeder
             services.AddScoped<DbSeeder>();
