@@ -1,0 +1,144 @@
+﻿/* Soccer League Theme - Green (#008751) and White (#FFFFFF) */
+
+:root {
+    --rz-primary: #008751;
+    --rz-secondary: #006B3F;
+    --rz-info: #17a2b8;
+    --rz-success: #28a745;
+    --rz-warning: #ffc107;
+    --rz-danger: #dc3545;
+    --rz-light: #f8f9fa;
+    --rz-dark: #343a40;
+    --rz-base-background-color: #FFFFFF;
+    --rz-base-text-color: #212529;
+    --rz-sidebar-background-color: #008751;
+    --rz-sidebar-text-color: #FFFFFF;
+    --rz-series-1: #008751;
+    --rz-series-2: #006B3F;
+    --rz-series-3: #00A865;
+    --rz-series-4: #33B87A;
+    --rz-series-5: #66C894;
+    --rz-border-radius: 0.375rem;
+}
+
+/* Override Radzen primary color */
+.rz-button-primary,
+.rz-button.rz-primary {
+    background-color: #008751;
+    border-color: #008751;
+}
+
+    .rz-button-primary:hover,
+    .rz-button.rz-primary:hover {
+        background-color: #006B3F;
+        border-color: #006B3F;
+    }
+
+.rz-state-highlight,
+.rz-paginator .rz-state-active {
+    background-color: #008751;
+    border-color: #008751;
+    color: #FFFFFF;
+}
+
+/* DataGrid selection */
+.rz-datatable .rz-datatable-tbody > tr.rz-state-highlight {
+    background-color: rgba(0, 135, 81, 0.1);
+    color: #008751;
+}
+
+/* Links */
+a {
+    color: #008751;
+}
+
+    a:hover {
+        color: #006B3F;
+    }
+
+/* Form controls focus */
+.rz-textbox:focus,
+.rz-dropdown:focus,
+.rz-multiselect:focus {
+    border-color: #008751;
+    box-shadow: 0 0 0 0.2rem rgba(0, 135, 81, 0.25);
+}
+
+/* Navigation */
+.rz-navigation-item-link:hover {
+    background-color: rgba(0, 135, 81, 0.1);
+}
+
+.rz-navigation-item-link.rz-navigation-item-link-active {
+    color: #008751;
+    border-left: 3px solid #008751;
+}
+
+/* Progress bars */
+.rz-progressbar-value {
+    background-color: #008751;
+}
+
+/* Badges */
+.rz-badge-primary {
+    background-color: #008751;
+}
+
+/* Custom utility classes */
+.bg-primary-custom {
+    background-color: #008751 !important;
+    color: #FFFFFF !important;
+}
+
+.text-primary-custom {
+    color: #008751 !important;
+}
+
+.border-primary-custom {
+    border-color: #008751 !important;
+}
+
+/* Card header customization */
+.rz-card .rz-card-title {
+    color: #008751;
+    font-weight: 600;
+}
+
+/* Panel header */
+.rz-panel .rz-panel-titlebar {
+    background-color: #008751;
+    color: #FFFFFF;
+}
+
+/* Dialog header */
+.rz-dialog .rz-dialog-titlebar {
+    background-color: #008751;
+    color: #FFFFFF;
+}
+
+/* Menu active item */
+.rz-menu .rz-menuitem-link.rz-state-highlight {
+    background-color: #008751;
+    color: #FFFFFF;
+}
+
+/* Tabs */
+.rz-tabview .rz-tabview-nav li.rz-highlight a {
+    border-color: #008751;
+    color: #008751;
+}
+
+/* Loading indicator */
+.rz-progressbar-indeterminate .rz-progressbar-value::before {
+    background-color: #008751;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar-thumb {
+    background: #008751;
+    border-radius: 4px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #006B3F;
+    }

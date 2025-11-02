@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+
+    <!-- Radzen Blazor CSS -->
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+
+    <!-- App CSS -->
+    <link rel="stylesheet" href="_content/SoccerLeague.Client.Shared/app.css" />
+    <link rel="stylesheet" href="_content/SoccerLeague.Client.Shared/css/theme.css" />
+    <link rel="stylesheet" href="SoccerLeague.Client.Web.styles.css" />
+
+    <HeadOutlet @rendermode="InteractiveWebAssembly" />
+</head>
+<body>
+    <Routes @rendermode="InteractiveWebAssembly" />
+
+    <!-- Radzen Blazor JS -->
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>
