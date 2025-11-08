@@ -1,0 +1,120 @@
+﻿@page "/login"
+@using SoccerLeague.Client.Shared.Services
+
+
+<PageTitle>Login - Soccer League</PageTitle>
+
+<RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12" Style="height: 100vh;"
+             AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+
+    <RadzenCard Style="max-width: 500px; width: 100%;" Class="rz-shadow-10">
+        <RadzenStack Gap="1.5rem">
+
+            <!-- Logo/Header -->
+            <RadzenStack AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenImage Path="images/logo.png" Style="width: 80px; height: 80px;"
+                             AlternateText="Soccer League Logo" />
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1"
+                            Class="rz-mb-0">
+                    Welcome Back
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-secondary">
+                    Sign in to your Soccer League account
+                </RadzenText>
+            </RadzenStack>
+
+            <!-- Login Form -->
+            <RadzenTemplateForm TItem="LoginRequest" Data="@loginRequest" Submit="@HandleLogin">
+                <RadzenStack Gap="1rem">
+
+                    <!-- Email Field -->
+                    <RadzenFormField Text="Email Address" Variant="@variant">
+                        <RadzenTextBox @bind-Value="@loginRequest.Email"
+                                       Name="Email"
+                                       Placeholder="Enter your email"
+                                       Style="width: 100%;"
+                                       aria-label="Email Address" />
+                        <RadzenRequiredValidator Component="Email"
+                                                 Text="Email is required" />
+                        <RadzenEmailValidator Component="Email"
+                                              Text="Invalid email format" />
+                    </RadzenFormField>
+
+                    <!-- Password Field -->
+                    <RadzenFormField Text="Password" Variant="@variant">
+                        <RadzenPassword @bind-Value="@loginRequest.Password"
+                                        Name="Password"
+                                        Placeholder="Enter your password"
+                                        Style="width: 100%;"
+                                        aria-label="Password" />
+                        <RadzenRequiredValidator Component="Password"
+                                                 Text="Password is required" />
+                    </RadzenFormField>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <RadzenStack Orientation="Orientation.Horizontal"
+                                 JustifyContent="JustifyContent.SpaceBetween"
+                                 AlignItems="AlignItems.Center"
+                                 Gap="1rem" Wrap="FlexWrap.Wrap">
+                        <RadzenCheckBox @bind-Value="@loginRequest.RememberMe"
+                                        Name="RememberMe"
+                                        TValue="bool" />
+                        <RadzenLabel Text="Remember me"
+                                     Component="RememberMe"
+                                     Style="cursor: pointer;" />
+
+                        <RadzenLink Path="/forgot-password"
+                                    Text="Forgot Password?"
+                                    Style="margin-left: auto;" />
+                    </RadzenStack>
+
+                    <!-- Login Button -->
+                    <RadzenButton ButtonType="ButtonType.Submit"
+                                  Text="Sign In"
+                                  Icon="login"
+                                  IsBusy="@isLoading"
+                                  BusyText="Signing in..."
+                                  Style="width: 100%;"
+                                  Size="ButtonSize.Large"
+                                  ButtonStyle="ButtonStyle.Primary" />
+
+                    <!-- Divider -->
+                    <RadzenStack Orientation="Orientation.Horizontal"
+                                 AlignItems="AlignItems.Center"
+                                 Gap="1rem">
+                        <RadzenText TextStyle="TextStyle.Body2"
+                                    Class="rz-color-secondary"
+                                    Style="white-space: nowrap;">
+                            Don't have an account?
+                        </RadzenText>
+                        <RadzenLink Path="/register"
+                                    Text="Sign Up"
+                                    Style="font-weight: 600;" />
+                    </RadzenStack>
+
+                    <!-- Optional: Social Login -->
+                    @if (showSocialLogin)
+                    {
+                        <RadzenStack Gap="0.5rem">
+                            <RadzenText TextStyle="TextStyle.Body2"
+                                        Class="rz-color-secondary"
+                                        Style="text-align: center;">
+                                Or continue with
+                            </RadzenText>
+                            <RadzenButton Text="Google"
+                                          Icon="account_circle"
+                                          Click="@HandleGoogleLogin"
+                                          ButtonStyle="ButtonStyle.Light"
+                                          Style="width: 100%;"
+                                          Disabled="@isLoading" />
+                        </RadzenStack>
+                    }
+
+                </RadzenStack>
+            </RadzenTemplateForm>
+
+        </RadzenStack>
+    </RadzenCard>
+
+</RadzenStack>
+

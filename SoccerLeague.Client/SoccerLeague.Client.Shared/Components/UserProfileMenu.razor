@@ -1,0 +1,58 @@
+﻿
+@using SoccerLeague.Client.Shared.Services
+
+
+@if (currentUser != null)
+{
+    <RadzenProfileMenu>
+        <Template>
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         AlignItems="AlignItems.Center"
+                         Gap="0.5rem"
+                         Style="cursor: pointer;">
+                
+                    <RadzenIcon Icon="account_circle" Style="font-size: 2.5rem;" />
+                
+                <RadzenStack Gap="0" Style="line-height: 1;">
+                    <RadzenText TextStyle="TextStyle.Body2" Style="font-weight: 600;">
+                        @currentUser.FullName
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-secondary">
+                        @currentUser.Email
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+        </Template>
+        <ChildContent>
+            <RadzenProfileMenuItem Text="Profile"
+                                   Icon="person"
+                                   Path="/profile" />
+            <RadzenProfileMenuItem Text="Settings"
+                                   Icon="settings"
+                                   Path="/settings" />
+            @if (currentUser.Roles.Contains("Admin"))
+            {
+                <RadzenProfileMenuItem Text="Admin Panel"
+                                       Icon="admin_panel_settings"
+                                       Path="/admin" />
+            }
+            <RadzenProfileMenuItem Text="Sign Out"
+                                   Icon="logout"
+                                   Click="@HandleLogout" />
+        </ChildContent>
+    </RadzenProfileMenu>
+}
+else
+{
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+        <RadzenButton Text="Sign In"
+                      ButtonStyle="ButtonStyle.Light"
+                      Icon="login"
+                      Click="@(() => Navigation.NavigateTo("/login"))" />
+        <RadzenButton Text="Sign Up"
+                      ButtonStyle="ButtonStyle.Primary"
+                      Icon="person_add"
+                      Click="@(() => Navigation.NavigateTo("/register"))" />
+    </RadzenStack>
+}
+

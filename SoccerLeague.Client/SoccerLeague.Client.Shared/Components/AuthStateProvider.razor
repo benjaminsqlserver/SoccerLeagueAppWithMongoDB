@@ -1,0 +1,31 @@
+﻿@using SoccerLeague.Client.Shared.Services
+
+
+@if (isLoading)
+{
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center"
+                 Style="height: 100vh;">
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary"
+                                   Mode="ProgressBarMode.Indeterminate" />
+        <RadzenText TextStyle="TextStyle.Body1">Loading...</RadzenText>
+    </RadzenStack>
+}
+else if (requiresAuth && !isAuthenticated)
+{
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center"
+                 Style="height: 100vh;" Gap="2rem">
+        <RadzenIcon Icon="lock" Style="font-size: 4rem; color: var(--rz-secondary);" />
+        <RadzenText TextStyle="TextStyle.H5">Authentication Required</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-secondary">
+            You need to be logged in to access this page.
+        </RadzenText>
+        <RadzenButton Text="Sign In" Icon="login"
+                      ButtonStyle="ButtonStyle.Primary"
+                      Click="@NavigateToLogin" />
+    </RadzenStack>
+}
+else
+{
+    @ChildContent
+}
+

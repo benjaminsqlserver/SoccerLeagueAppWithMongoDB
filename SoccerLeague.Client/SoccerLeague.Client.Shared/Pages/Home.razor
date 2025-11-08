@@ -1,7 +1,89 @@
 ﻿@page "/"
+@using SoccerLeague.Client.Shared.Components
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<PageTitle>Home - Soccer League</PageTitle>
 
-Welcome to your new app.
+<AuthStateProvider RequiresAuth="false">
+
+    <RadzenStack Gap="2rem" Class="rz-p-4">
+
+        <!-- Hero Section -->
+        <RadzenCard Style="background: linear-gradient(135deg, var(--rz-primary) 0%, var(--rz-info) 100%);">
+            <RadzenStack Gap="1rem" Style="padding: 3rem; color: white;" AlignItems="AlignItems.Center">
+                <RadzenText TextStyle="TextStyle.H2" Style="color: white; text-align: center;">
+                    Welcome to Soccer League
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" Style="color: white; text-align: center; opacity: 0.9;">
+                    Track matches, follow teams, and stay updated with live standings
+                </RadzenText>
+
+                @if (currentUser != null)
+                {
+                    <RadzenText TextStyle="TextStyle.Body1" Style="color: white;">
+                        Hello, @currentUser.FullName!
+                    </RadzenText>
+                }
+                else
+                {
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+                        <RadzenButton Text="Get Started"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Size="ButtonSize.Large"
+                                      Click="@(() => Navigation.NavigateTo("/register"))" />
+                        <RadzenButton Text="Sign In"
+                                      ButtonStyle="ButtonStyle.Secondary"
+                                      Variant="Variant.Outlined"
+                                      Size="ButtonSize.Large"
+                                      Click="@(() => Navigation.NavigateTo("/login"))" />
+                    </RadzenStack>
+                }
+            </RadzenStack>
+        </RadzenCard>
+
+        <!-- Feature Cards -->
+        <RadzenRow Gap="2rem">
+            <RadzenColumn Size="12" SizeMD="4">
+                <RadzenCard>
+                    <RadzenStack Gap="1rem" AlignItems="AlignItems.Center">
+                        <RadzenIcon Icon="groups" Style="font-size: 3rem; color: var(--rz-primary);" />
+                        <RadzenText TextStyle="TextStyle.H6">Teams</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-secondary"
+                                    Style="text-align: center;">
+                            Browse and follow your favorite teams
+                        </RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="4">
+                <RadzenCard>
+                    <RadzenStack Gap="1rem" AlignItems="AlignItems.Center">
+                        <RadzenIcon Icon="sports_soccer" Style="font-size: 3rem; color: var(--rz-success);" />
+                        <RadzenText TextStyle="TextStyle.H6">Matches</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-secondary"
+                                    Style="text-align: center;">
+                            View upcoming and past match results
+                        </RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="4">
+                <RadzenCard>
+                    <RadzenStack Gap="1rem" AlignItems="AlignItems.Center">
+                        <RadzenIcon Icon="leaderboard" Style="font-size: 3rem; color: var(--rz-warning);" />
+                        <RadzenText TextStyle="TextStyle.H6">Standings</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-secondary"
+                                    Style="text-align: center;">
+                            Check league standings and statistics
+                        </RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+    </RadzenStack>
+
+</AuthStateProvider>
+
