@@ -1,6 +1,36 @@
-﻿<Router AppAssembly="typeof(Layout.MainLayout).Assembly">
+﻿@using SoccerLeague.Client.Shared.Layout
+@inject NavigationManager Navigation
+
+<Router AppAssembly="@typeof(Routes).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <RadzenStack AlignItems="AlignItems.Center"
+                         JustifyContent="JustifyContent.Center"
+                         Style="height: 100vh;"
+                         Gap="2rem">
+                <RadzenIcon Icon="error_outline"
+                            Style="font-size: 6rem; color: var(--rz-secondary);" />
+                <RadzenText TextStyle="TextStyle.H3">404 - Page Not Found</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" Class="rz-color-secondary">
+                    The page you're looking for doesn't exist.
+                </RadzenText>
+                <RadzenButton Text="Go Home"
+                              Icon="home"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@NavigateToHome" />
+            </RadzenStack>
+        </LayoutView>
+    </NotFound>
 </Router>
+
+@code {
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

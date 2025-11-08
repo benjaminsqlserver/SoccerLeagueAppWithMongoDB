@@ -1,9 +1,78 @@
-﻿@inherits LayoutComponentBase
+﻿
 
-@Body
+@inherits LayoutComponentBase
+@using SoccerLeague.Client.Shared.Components
+@inject NavigationManager Navigation
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" 
+                    AlignItems="AlignItems.Center" 
+                    JustifyContent="JustifyContent.SpaceBetween"
+                    Gap="1rem"
+                    Style="padding: 1rem 2rem;">
+            
+            <!-- Logo and Title -->
+            <RadzenStack Orientation="Orientation.Horizontal" 
+                        AlignItems="AlignItems.Center" 
+                        Gap="1rem"
+                        Style="cursor: pointer;"
+                        @onclick="@(() => Navigation.NavigateTo("/"))">
+                <RadzenImage Path="images/logo.png" 
+                            Style="width: 40px; height: 40px;" 
+                            AlternateText="Soccer League" />
+                <RadzenText TextStyle="TextStyle.H6" 
+                           Style="margin: 0; font-weight: 700;">
+                    Soccer League
+                </RadzenText>
+            </RadzenStack>
+
+            <!-- Navigation Menu (Desktop) -->
+            <RadzenStack Orientation="Orientation.Horizontal" 
+                        AlignItems="AlignItems.Center" 
+                        Gap="1rem"
+                        Class="rz-display-none rz-display-md-flex">
+                <RadzenButton Text="Home" 
+                             ButtonStyle="ButtonStyle.Light" 
+                             Variant="Variant.Text"
+                             Click="@(() => Navigation.NavigateTo("/"))" />
+                <RadzenButton Text="Teams" 
+                             ButtonStyle="ButtonStyle.Light" 
+                             Variant="Variant.Text"
+                             Click="@(() => Navigation.NavigateTo("/teams"))" />
+                <RadzenButton Text="Matches" 
+                             ButtonStyle="ButtonStyle.Light" 
+                             Variant="Variant.Text"
+                             Click="@(() => Navigation.NavigateTo("/matches"))" />
+                <RadzenButton Text="Standings" 
+                             ButtonStyle="ButtonStyle.Light" 
+                             Variant="Variant.Text"
+                             Click="@(() => Navigation.NavigateTo("/standings"))" />
+            </RadzenStack>
+
+            <!-- User Profile Menu -->
+            <UserProfileMenu />
+
+        </RadzenStack>
+    </RadzenHeader>
+    
+    <RadzenBody>
+        <RadzenContentContainer>
+            @Body
+        </RadzenContentContainer>
+    </RadzenBody>
+    
+    <RadzenFooter>
+        <RadzenStack Orientation="Orientation.Horizontal" 
+                    AlignItems="AlignItems.Center" 
+                    JustifyContent="JustifyContent.Center"
+                    Gap="2rem"
+                    Style="padding: 1rem;">
+            <RadzenText TextStyle="TextStyle.Caption" Class="rz-color-secondary">
+                © @DateTime.Now.Year Soccer League. All rights reserved.
+            </RadzenText>
+        </RadzenStack>
+    </RadzenFooter>
+</RadzenLayout>
+
+<RadzenComponents />

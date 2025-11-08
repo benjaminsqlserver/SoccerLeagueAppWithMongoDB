@@ -1,0 +1,182 @@
+﻿@page "/register"
+@using SoccerLeague.Client.Shared.Services
+
+
+<PageTitle>Register - Soccer League</PageTitle>
+
+<RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12" Style="min-height: 100vh;"
+             AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+
+    <RadzenCard Style="max-width: 600px; width: 100%;" Class="rz-shadow-10">
+        <RadzenStack Gap="1.5rem">
+
+            <!-- Logo/Header -->
+            <RadzenStack AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenImage Path="images/logo.png" Style="width: 80px; height: 80px;"
+                             AlternateText="Soccer League Logo" />
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1"
+                            Class="rz-mb-0">
+                    Create Account
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-secondary">
+                    Join the Soccer League community today
+                </RadzenText>
+            </RadzenStack>
+
+            <!-- Registration Form -->
+            <RadzenTemplateForm TItem="RegisterRequest" Data="@registerRequest" Submit="@HandleRegister">
+                <RadzenStack Gap="1rem">
+
+                    <!-- Name Fields (Side by Side) -->
+                    <RadzenRow Gap="1rem">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="First Name" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@registerRequest.FirstName"
+                                               Name="FirstName"
+                                               Placeholder="John"
+                                               Style="width: 100%;"
+                                               MaxLength="100"
+                                               aria-label="First Name" />
+                                <RadzenRequiredValidator Component="FirstName"
+                                                         Text="First name is required" />
+                                <RadzenLengthValidator Component="FirstName"
+                                                       Max="100"
+                                                       Text="First name too long" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Last Name" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@registerRequest.LastName"
+                                               Name="LastName"
+                                               Placeholder="Doe"
+                                               Style="width: 100%;"
+                                               MaxLength="100"
+                                               aria-label="Last Name" />
+                                <RadzenRequiredValidator Component="LastName"
+                                                         Text="Last name is required" />
+                                <RadzenLengthValidator Component="LastName"
+                                                       Max="100"
+                                                       Text="Last name too long" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <!-- Email Field -->
+                    <RadzenFormField Text="Email Address" Variant="@variant">
+                        <RadzenTextBox @bind-Value="@registerRequest.Email"
+                                       Name="Email"
+                                       Placeholder="john.doe@example.com"
+                                       Style="width: 100%;"
+                                       MaxLength="256"
+                                       aria-label="Email Address" />
+                        <RadzenRequiredValidator Component="Email"
+                                                 Text="Email is required" />
+                        <RadzenEmailValidator Component="Email"
+                                              Text="Invalid email format" />
+                    </RadzenFormField>
+
+                    <!-- Phone Number (Optional) -->
+                    <RadzenFormField Text="Phone Number (Optional)" Variant="@variant">
+                        <RadzenTextBox @bind-Value="@registerRequest.PhoneNumber"
+                                       Name="PhoneNumber"
+                                       Placeholder="+234 800 000 0000"
+                                       Style="width: 100%;"
+                                       MaxLength="20"
+                                       aria-label="Phone Number" />
+                    </RadzenFormField>
+
+                    <!-- Password Field -->
+                    <RadzenFormField Text="Password" Variant="@variant">
+                        <RadzenPassword @bind-Value="@registerRequest.Password"
+                                        Name="Password"
+                                        Placeholder="Minimum 8 characters"
+                                        Style="width: 100%;"
+                                        aria-label="Password" />
+                        <RadzenRequiredValidator Component="Password"
+                                                 Text="Password is required" />
+                        <RadzenLengthValidator Component="Password"
+                                               Min="8"
+                                               Text="Password must be at least 8 characters" />
+                        <RadzenRegexValidator Component="Password"
+                                              Pattern="@passwordPattern"
+                                              Text="Password must contain uppercase, lowercase, number, and special character" />
+                    </RadzenFormField>
+
+                    <!-- Confirm Password Field -->
+                    <RadzenFormField Text="Confirm Password" Variant="@variant">
+                        <RadzenPassword @bind-Value="@registerRequest.ConfirmPassword"
+                                        Name="ConfirmPassword"
+                                        Placeholder="Re-enter password"
+                                        Style="width: 100%;"
+                                        aria-label="Confirm Password" />
+                        <RadzenRequiredValidator Component="ConfirmPassword"
+                                                 Text="Please confirm your password" />
+                        <RadzenCompareValidator Component="ConfirmPassword"
+                                                Value="@registerRequest.Password"
+                                                Text="Passwords do not match" />
+                    </RadzenFormField>
+
+                    <!-- Password Requirements Info -->
+                    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Size="AlertSize.Small">
+                        <RadzenStack Gap="0.25rem">
+                            <RadzenText TextStyle="TextStyle.Body2">Password must contain:</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">• At least 8 characters</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">• One uppercase letter</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">• One lowercase letter</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">• One number</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">@("• One special character (@!%*?&)")</RadzenText>
+                        </RadzenStack>
+                    </RadzenAlert>
+
+                    <!-- Terms and Conditions -->
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                        <RadzenCheckBox @bind-Value="@acceptTerms"
+                                        Name="AcceptTerms"
+                                        TValue="bool" />
+                        <RadzenLabel Text="I agree to the " Component="AcceptTerms" Style="cursor: pointer;" />
+                        <RadzenLink Path="/terms" Text="Terms of Service" Target="_blank" />
+                        <RadzenText TextStyle="TextStyle.Body2">and</RadzenText>
+                        <RadzenLink Path="/privacy" Text="Privacy Policy" Target="_blank" />
+                    </RadzenStack>
+
+                    @if (showTermsError)
+                    {
+                        <RadzenText TextStyle="TextStyle.Caption"
+                                    Style="color: var(--rz-danger);">
+                            You must accept the terms and conditions
+                        </RadzenText>
+                    }
+
+                    <!-- Register Button -->
+                    <RadzenButton ButtonType="ButtonType.Submit"
+                                  Text="Create Account"
+                                  Icon="person_add"
+                                  IsBusy="@isLoading"
+                                  BusyText="Creating account..."
+                                  Style="width: 100%;"
+                                  Size="ButtonSize.Large"
+                                  ButtonStyle="ButtonStyle.Primary" />
+
+                    <!-- Login Link -->
+                    <RadzenStack Orientation="Orientation.Horizontal"
+                                 AlignItems="AlignItems.Center"
+                                 Gap="1rem"
+                                 JustifyContent="JustifyContent.Center">
+                        <RadzenText TextStyle="TextStyle.Body2"
+                                    Class="rz-color-secondary">
+                            Already have an account?
+                        </RadzenText>
+                        <RadzenLink Path="/login"
+                                    Text="Sign In"
+                                    Style="font-weight: 600;" />
+                    </RadzenStack>
+
+                </RadzenStack>
+            </RadzenTemplateForm>
+
+        </RadzenStack>
+    </RadzenCard>
+
+</RadzenStack>
+
